@@ -54,6 +54,8 @@ squares imagePaths =
 view : Model -> Html Msg
 view model =
   div []
+    (
     (squares images)
      |> List.repeat 2
      |> List.foldr (++) []
+    )

@@ -5528,7 +5528,14 @@ var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_Nil,
-		author$project$Main$squares(author$project$Main$images));
+		A3(
+			elm$core$List$foldr,
+			elm$core$Basics$append,
+			_List_Nil,
+			A2(
+				elm$core$List$repeat,
+				2,
+				author$project$Main$squares(author$project$Main$images))));
 };
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
