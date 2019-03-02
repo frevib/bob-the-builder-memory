@@ -1,7 +1,7 @@
 import Browser
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, button, div, text, img)
 import Html.Events exposing (onClick)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (style, src, width, height)
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
@@ -25,24 +25,35 @@ update msg model =
       else
         { model | opened = boxNumber + model.opened }
 
-squareDiv : Model -> Html msg
-squareDiv model =
-  div
-    [ style "background-color" "red"
-    , style "width" "100px"
-    , style "height" "100px"
-    ]
-    [ text ("w00t" ++ (String.fromInt model.opened)) ]
+images : List String
+images =
+  [
+  "src/img/bob_the_builder_01.jpeg"
+  , "src/img/bob_the_builder_01.jpeg"
+  , "src/img/bob_the_builder_01.jpeg"
+  ]
+
+squares : List String -> List (Html msg)
+squares imagePaths =
+  List.map (\a -> img [src a, width 100, height 100] []) imagePaths
+   |> List.repeat 2
+   |> List.foldr (++) []
+
+
+-- squareDiv : Model -> Html msg
+-- squareDiv model =
+--   div
+--     [ style "background-color" "red"
+--     , style "width" "100px"
+--     , style "height" "100px"
+--     ]
+--     [ text ("w00t" ++ (String.fromInt model.opened)) ]
 
 
 -- view
 view : Model -> Html Msg
 view model =
   div []
-    [
-    -- [ button [ onClick Decrement ] [ text "-"]
-    -- div [] [ text (String.fromInt  model ) ]
-    -- , div [ onClick (Flip 4) ] [ text "other text" ]
-    squareDiv model
-    , button [ onClick (Flip 3)] [ text "++++"]
-    ]
+    (squares images)
+     |> List.repeat 2
+     |> List.foldr (++) []
