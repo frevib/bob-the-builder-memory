@@ -4971,12 +4971,7 @@ var author$project$Main$update = F2(
 			{opened: boxNumber + model.opened});
 	});
 var author$project$Main$images = _List_fromArray(
-	['src/img/bob_the_builder_01.jpeg', 'src/img/bob_the_builder_01.jpeg', 'src/img/bob_the_builder_01.jpeg']);
-var elm$core$Basics$apR = F2(
-	function (x, f) {
-		return f(x);
-	});
-var elm$core$Basics$append = _Utils_append;
+	['src/img/bob_the_builder_01.jpeg', 'src/img/dizzy.jpeg', 'src/img/rollie.jpeg', 'src/img/muck.jpeg', 'src/img/benny.jpeg', 'src/img/scoop.jpeg']);
 var elm$core$List$foldl = F3(
 	function (func, acc, list) {
 		foldl:
@@ -5068,29 +5063,6 @@ var elm$core$List$map = F2(
 			_List_Nil,
 			xs);
 	});
-var elm$core$Basics$le = _Utils_le;
-var elm$core$Basics$sub = _Basics_sub;
-var elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
-		while (true) {
-			if (n <= 0) {
-				return result;
-			} else {
-				var $temp$result = A2(elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
-				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
-			}
-		}
-	});
-var elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3(elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
 var elm$core$Basics$identity = function (x) {
 	return x;
 };
@@ -5148,6 +5120,10 @@ var elm$core$Array$compressNodes = F2(
 			}
 		}
 	});
+var elm$core$Basics$apR = F2(
+	function (x, f) {
+		return f(x);
+	});
 var elm$core$Basics$eq = _Utils_equal;
 var elm$core$Tuple$first = function (_n0) {
 	var x = _n0.a;
@@ -5179,6 +5155,7 @@ var elm$core$Basics$max = F2(
 		return (_Utils_cmp(x, y) > 0) ? x : y;
 	});
 var elm$core$Basics$mul = _Basics_mul;
+var elm$core$Basics$sub = _Basics_sub;
 var elm$core$Elm$JsArray$length = _JsArray_length;
 var elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
@@ -5232,6 +5209,7 @@ var elm$core$Array$initializeHelp = F5(
 			}
 		}
 	});
+var elm$core$Basics$le = _Utils_le;
 var elm$core$Basics$remainderBy = _Basics_remainderBy;
 var elm$core$Array$initialize = F2(
 	function (len, fn) {
@@ -5270,6 +5248,7 @@ var elm$json$Json$Decode$OneOf = function (a) {
 	return {$: 'OneOf', a: a};
 };
 var elm$core$Basics$and = _Basics_and;
+var elm$core$Basics$append = _Utils_append;
 var elm$core$Basics$or = _Basics_or;
 var elm$core$Char$toCode = _Char_toCode;
 var elm$core$Char$isLower = function (_char) {
@@ -5473,6 +5452,7 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
+var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$img = _VirtualDom_node('img');
 var elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -5501,41 +5481,76 @@ var elm$html$Html$Attributes$width = function (n) {
 		elm$core$String$fromInt(n));
 };
 var author$project$Main$squares = function (imagePaths) {
-	return A3(
-		elm$core$List$foldr,
-		elm$core$Basics$append,
-		_List_Nil,
-		A2(
-			elm$core$List$repeat,
-			2,
-			A2(
-				elm$core$List$map,
-				function (a) {
-					return A2(
+	return A2(
+		elm$core$List$map,
+		function (a) {
+			return A2(
+				elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
 						elm$html$Html$img,
 						_List_fromArray(
 							[
 								elm$html$Html$Attributes$src(a),
-								elm$html$Html$Attributes$width(100),
-								elm$html$Html$Attributes$height(100)
+								elm$html$Html$Attributes$width(200),
+								elm$html$Html$Attributes$height(200)
 							]),
-						_List_Nil);
-				},
-				imagePaths)));
+						_List_Nil)
+					]));
+		},
+		imagePaths);
 };
-var elm$html$Html$div = _VirtualDom_node('div');
+var elm$core$List$repeatHelp = F3(
+	function (result, n, value) {
+		repeatHelp:
+		while (true) {
+			if (n <= 0) {
+				return result;
+			} else {
+				var $temp$result = A2(elm$core$List$cons, value, result),
+					$temp$n = n - 1,
+					$temp$value = value;
+				result = $temp$result;
+				n = $temp$n;
+				value = $temp$value;
+				continue repeatHelp;
+			}
+		}
+	});
+var elm$core$List$repeat = F2(
+	function (n, value) {
+		return A3(elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				A2(elm$html$Html$Attributes$style, 'display', 'flex'),
+				A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
+			]),
 		A3(
 			elm$core$List$foldr,
 			elm$core$Basics$append,
 			_List_Nil,
 			A2(
 				elm$core$List$repeat,
-				2,
-				author$project$Main$squares(author$project$Main$images))));
+				4,
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								A2(elm$html$Html$Attributes$style, 'display', 'flex'),
+								A2(elm$html$Html$Attributes$style, 'flex-direction', 'column')
+							]),
+						author$project$Main$squares(author$project$Main$images))
+					]))));
 };
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
@@ -5828,8 +5843,6 @@ var elm$browser$Debugger$Overlay$viewBadMetadata = function (_n0) {
 var elm$browser$Debugger$Overlay$Cancel = {$: 'Cancel'};
 var elm$browser$Debugger$Overlay$Proceed = {$: 'Proceed'};
 var elm$html$Html$button = _VirtualDom_node('button');
-var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };

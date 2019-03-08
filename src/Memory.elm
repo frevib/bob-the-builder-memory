@@ -29,15 +29,22 @@ images : List String
 images =
   [
   "src/img/bob_the_builder_01.jpeg"
-  , "src/img/bob_the_builder_01.jpeg"
-  , "src/img/bob_the_builder_01.jpeg"
+  , "src/img/dizzy.jpeg"
+  , "src/img/rollie.jpeg"
+  , "src/img/muck.jpeg"
+  , "src/img/benny.jpeg"
+  , "src/img/scoop.jpeg"
   ]
 
 squares : List String -> List (Html msg)
 squares imagePaths =
-  List.map (\a -> img [src a, width 100, height 100] []) imagePaths
-   |> List.repeat 2
-   |> List.foldr (++) []
+  List.map (\a ->
+    div
+    []
+    [ img [src a, width 200, height 200] [] ])
+    imagePaths
+   -- |> List.repeat 1
+   -- |> List.foldr (++) []
 
 
 -- squareDiv : Model -> Html msg
@@ -53,9 +60,18 @@ squares imagePaths =
 -- view
 view : Model -> Html Msg
 view model =
-  div []
-    (
-    (squares images)
-     |> List.repeat 2
-     |> List.foldr (++) []
-    )
+  div [style "display" "flex", style "flex-direction" "row"]
+  ([ div
+  [ style "display" "flex", style "flex-direction" "column" ]
+  (squares images)
+  ]
+   -- |> List.append [ div [] [ text "w000t" ]]
+   |> List.repeat 4
+   |> List.foldr (++) []
+  )
+    -- |> List.append [ div [] [ text "w000t" ]]
+    -- |> List.repeat 2
+    -- |> List.foldr (++) []
+    -- )
+     -- |> List.repeat 2
+     -- |> List.foldr (++) []
