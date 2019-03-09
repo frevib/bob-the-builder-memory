@@ -50,6 +50,10 @@ images2 =
     , "src/img/scoop.jpeg"
     ]
 
+styleFlexBox : String -> List (Html.Attribute Msg)
+styleFlexBox direction =
+  [ style "display" "flex", style "flex-direction" direction ]
+
 
 squares : List String -> List (Html msg)
 squares imagePaths =
@@ -59,7 +63,7 @@ squares imagePaths =
 -- view
 view : Model -> Html Msg
 view model =
-  div [ style "display" "flex", style "flex-direction" "column"]
-  [ div [ style "display" "flex", style "flex-direction" "row" ] (squares images1)
-  , div [ style "display" "flex", style "flex-direction" "row" ] (squares images2)
+  div (styleFlexBox "column")
+  [ div (styleFlexBox "row") (squares images1)
+  , div (styleFlexBox "row") (squares images2)
   ]

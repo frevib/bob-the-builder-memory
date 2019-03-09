@@ -5512,34 +5512,29 @@ var author$project$Main$squares = function (imagePaths) {
 			},
 			imagePaths));
 };
-var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
+var author$project$Main$styleFlexBox = function (direction) {
+	return _List_fromArray(
+		[
+			A2(elm$html$Html$Attributes$style, 'display', 'flex'),
+			A2(elm$html$Html$Attributes$style, 'flex-direction', direction)
+		]);
+};
+var elm$html$Html$div = _VirtualDom_node('div');
 var author$project$Main$view = function (model) {
 	return A2(
 		elm$html$Html$div,
-		_List_fromArray(
-			[
-				A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2(elm$html$Html$Attributes$style, 'flex-direction', 'column')
-			]),
+		author$project$Main$styleFlexBox('column'),
 		_List_fromArray(
 			[
 				A2(
 				elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-						A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
-					]),
+				author$project$Main$styleFlexBox('row'),
 				author$project$Main$squares(author$project$Main$images1)),
 				A2(
 				elm$html$Html$div,
-				_List_fromArray(
-					[
-						A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-						A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
-					]),
+				author$project$Main$styleFlexBox('row'),
 				author$project$Main$squares(author$project$Main$images2))
 			]));
 };
