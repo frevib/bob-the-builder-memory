@@ -4970,8 +4970,14 @@ var author$project$Main$update = F2(
 			model,
 			{opened: boxNumber + model.opened});
 	});
-var author$project$Main$images = _List_fromArray(
+var author$project$Main$images1 = _List_fromArray(
 	['src/img/bob_the_builder_01.jpeg', 'src/img/dizzy.jpeg', 'src/img/rollie.jpeg', 'src/img/muck.jpeg', 'src/img/benny.jpeg', 'src/img/scoop.jpeg']);
+var author$project$Main$images2 = _List_fromArray(
+	['src/img/bob_the_builder_01.jpeg', 'src/img/dizzy.jpeg', 'src/img/rollie.jpeg', 'src/img/muck.jpeg', 'src/img/benny.jpeg', 'src/img/scoop.jpeg']);
+var elm$core$Basics$apR = F2(
+	function (x, f) {
+		return f(x);
+	});
 var elm$core$List$foldl = F3(
 	function (func, acc, list) {
 		foldl:
@@ -5049,6 +5055,17 @@ var elm$core$List$foldr = F3(
 	function (fn, acc, ls) {
 		return A4(elm$core$List$foldrHelper, fn, acc, 0, ls);
 	});
+var elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
+		}
+	});
+var elm$core$List$concat = function (lists) {
+	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
+};
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5119,10 +5136,6 @@ var elm$core$Array$compressNodes = F2(
 				continue compressNodes;
 			}
 		}
-	});
-var elm$core$Basics$apR = F2(
-	function (x, f) {
-		return f(x);
 	});
 var elm$core$Basics$eq = _Utils_equal;
 var elm$core$Tuple$first = function (_n0) {
@@ -5452,7 +5465,6 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 			return 3;
 	}
 };
-var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$img = _VirtualDom_node('img');
 var elm$html$Html$Attributes$height = function (n) {
 	return A2(
@@ -5481,48 +5493,26 @@ var elm$html$Html$Attributes$width = function (n) {
 		elm$core$String$fromInt(n));
 };
 var author$project$Main$squares = function (imagePaths) {
-	return A2(
-		elm$core$List$map,
-		function (a) {
-			return A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
+	return elm$core$List$concat(
+		A2(
+			elm$core$List$map,
+			function (item) {
+				return _List_fromArray(
 					[
 						A2(
 						elm$html$Html$img,
 						_List_fromArray(
 							[
-								elm$html$Html$Attributes$src(a),
+								elm$html$Html$Attributes$src(item),
 								elm$html$Html$Attributes$width(200),
 								elm$html$Html$Attributes$height(200)
 							]),
 						_List_Nil)
-					]));
-		},
-		imagePaths);
+					]);
+			},
+			imagePaths));
 };
-var elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
-		while (true) {
-			if (n <= 0) {
-				return result;
-			} else {
-				var $temp$result = A2(elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
-				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
-			}
-		}
-	});
-var elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3(elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
+var elm$html$Html$div = _VirtualDom_node('div');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var author$project$Main$view = function (model) {
@@ -5531,26 +5521,27 @@ var author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-				A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
+				A2(elm$html$Html$Attributes$style, 'flex-direction', 'column')
 			]),
-		A3(
-			elm$core$List$foldr,
-			elm$core$Basics$append,
-			_List_Nil,
-			A2(
-				elm$core$List$repeat,
-				4,
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$div,
 				_List_fromArray(
 					[
-						A2(
-						elm$html$Html$div,
-						_List_fromArray(
-							[
-								A2(elm$html$Html$Attributes$style, 'display', 'flex'),
-								A2(elm$html$Html$Attributes$style, 'flex-direction', 'column')
-							]),
-						author$project$Main$squares(author$project$Main$images))
-					]))));
+						A2(elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
+					]),
+				author$project$Main$squares(author$project$Main$images1)),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						A2(elm$html$Html$Attributes$style, 'display', 'flex'),
+						A2(elm$html$Html$Attributes$style, 'flex-direction', 'row')
+					]),
+				author$project$Main$squares(author$project$Main$images2))
+			]));
 };
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
@@ -7790,17 +7781,6 @@ var elm$core$Dict$values = function (dict) {
 			}),
 		_List_Nil,
 		dict);
-};
-var elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3(elm$core$List$foldr, elm$core$List$cons, ys, xs);
-		}
-	});
-var elm$core$List$concat = function (lists) {
-	return A3(elm$core$List$foldr, elm$core$List$append, _List_Nil, lists);
 };
 var elm$core$List$concatMap = F2(
 	function (f, list) {

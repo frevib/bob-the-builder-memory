@@ -2,6 +2,9 @@ import Browser
 import Html exposing (Html, button, div, text, img)
 import Html.Events exposing (onClick)
 import Html.Attributes exposing (style, src, width, height)
+import Array
+-- import Random exposing (Seed, generate)
+-- import Random.List exposing (shuffle)
 
 main =
   Browser.sandbox { init = init, update = update, view = view }
@@ -25,8 +28,8 @@ update msg model =
       else
         { model | opened = boxNumber + model.opened }
 
-images : List String
-images =
+images1 : List String
+images1 =
   [
   "src/img/bob_the_builder_01.jpeg"
   , "src/img/dizzy.jpeg"
@@ -36,42 +39,27 @@ images =
   , "src/img/scoop.jpeg"
   ]
 
+images2 : List String
+images2 =
+    [
+    "src/img/bob_the_builder_01.jpeg"
+    , "src/img/dizzy.jpeg"
+    , "src/img/rollie.jpeg"
+    , "src/img/muck.jpeg"
+    , "src/img/benny.jpeg"
+    , "src/img/scoop.jpeg"
+    ]
+
+
 squares : List String -> List (Html msg)
 squares imagePaths =
-  List.map (\a ->
-    div
-    []
-    [ img [src a, width 200, height 200] [] ])
-    imagePaths
-   -- |> List.repeat 1
-   -- |> List.foldr (++) []
-
-
--- squareDiv : Model -> Html msg
--- squareDiv model =
---   div
---     [ style "background-color" "red"
---     , style "width" "100px"
---     , style "height" "100px"
---     ]
---     [ text ("w00t" ++ (String.fromInt model.opened)) ]
-
+  List.map (\item -> [ img [src item, width 200, height 200] [] ]) imagePaths
+  |> List.concat
 
 -- view
 view : Model -> Html Msg
 view model =
-  div [style "display" "flex", style "flex-direction" "row"]
-  ([ div
-  [ style "display" "flex", style "flex-direction" "column" ]
-  (squares images)
+  div [ style "display" "flex", style "flex-direction" "column"]
+  [ div [ style "display" "flex", style "flex-direction" "row" ] (squares images1)
+  , div [ style "display" "flex", style "flex-direction" "row" ] (squares images2)
   ]
-   -- |> List.append [ div [] [ text "w000t" ]]
-   |> List.repeat 4
-   |> List.foldr (++) []
-  )
-    -- |> List.append [ div [] [ text "w000t" ]]
-    -- |> List.repeat 2
-    -- |> List.foldr (++) []
-    -- )
-     -- |> List.repeat 2
-     -- |> List.foldr (++) []
