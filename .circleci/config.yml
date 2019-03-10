@@ -1,0 +1,16 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: nginx:alpine
+
+    steps:
+      - checkout
+
+      - run:
+          name: elm-memory-build
+          command: elm-make src/Memory.elm
+
+      - run:
+          name: Print the Current Time
+          command: date
