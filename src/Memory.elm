@@ -57,22 +57,18 @@ images2 =
 
 styleFlexBox : String -> List (Html.Attribute Msg)
 styleFlexBox direction =
-  -- if opened == 1 then
     [
     style "display" "flex"
     , style "flex-direction" direction
     ]
-  -- else
-  --   [
-  --   style "display" "flex"
-  --   , style "flex-direction" direction
-  --   , style "background" "red"
-  --   ]
+
 
 
 squares : List String -> List (Html Msg)
 squares imagePaths =
-  List.map (\item -> [ div [] [ img [src item, width 200, height 200, onClick (Flip item) ] [] ] ]) imagePaths
+  List.map (\item ->
+    [ div [ style "opacity" "0.5", style "border-style" "dotted" ] [ img [src item, width 200, height 200, onClick (Flip item) ] [] ] ]
+    ) imagePaths
   |> List.concat
 
 -- view
@@ -81,4 +77,5 @@ view model =
   div (styleFlexBox "column")
   [ div (styleFlexBox "row") (squares images1)
   , div (styleFlexBox "row") (squares images2)
+  , div [] [ text (model.message)]
   ]
