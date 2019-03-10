@@ -11,22 +11,27 @@ main =
 
 -- model
 type alias Model =
-  { opened: Int }
+  { openedImage: String, message: String }
 
 init : Model
-init = { opened = 0 }
+init = { openedImage = "", message = "" }
 
 -- update
-type Msg = Flip Int
+type Msg = Flip String
+
 
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Flip boxNumber ->
-      if model.opened > 3 then
-        { opened = 0 }
+    Flip openedImage ->
+      if model.openedImage == "" then
+        { openedImage = openedImage, message = "one more!" }
       else
-        { model | opened = boxNumber + model.opened }
+        if openedImage == model.openedImage then
+          { openedImage = "", message = "Bingo!" }
+        else
+          { openedImage = "", message = "too bad :(" }
+
 
 images1 : List String
 images1 =
@@ -52,12 +57,22 @@ images2 =
 
 styleFlexBox : String -> List (Html.Attribute Msg)
 styleFlexBox direction =
-  [ style "display" "flex", style "flex-direction" direction ]
+  -- if opened == 1 then
+    [
+    style "display" "flex"
+    , style "flex-direction" direction
+    ]
+  -- else
+  --   [
+  --   style "display" "flex"
+  --   , style "flex-direction" direction
+  --   , style "background" "red"
+  --   ]
 
 
-squares : List String -> List (Html msg)
+squares : List String -> List (Html Msg)
 squares imagePaths =
-  List.map (\item -> [ img [src item, width 200, height 200] [] ]) imagePaths
+  List.map (\item -> [ div [] [ img [src item, width 200, height 200, onClick (Flip item) ] [] ] ]) imagePaths
   |> List.concat
 
 -- view
