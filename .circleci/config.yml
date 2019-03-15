@@ -9,7 +9,7 @@ jobs:
 
       - run:
           name: elm-memory-build
-          command: elm-make src/Memory.elm
+          command: elm make src/Memory.elm
 
       - run:
           name: Print the Current Time
