@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), images1, init, main, split, squares, styleFlexBox, update, view)
+module Main exposing (Model, Msg(..), images, init, main, split, squares, styleFlexBox, update, view)
 
 import Array
 import Browser
@@ -6,53 +6,32 @@ import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (height, src, style, width)
 import Html.Events exposing (onClick)
 import List exposing (drop, take)
-
--- import Random exposing (Seed, generate)
--- import Random.List exposing (shuffle)
-
-
-main =
-    Browser.sandbox { init = init, update = update, view = view }
+import Random
+import Random.List exposing (shuffle)
 
 
--- model
+type alias Flags =
+    ()
+
+
+type alias ImageRecord =
+    { id : Int, url : String, opened : Bool }
 
 
 type alias Model =
-    { openedImage : String, message : String }
+    List ImageRecord
 
 
-init : Model
-init =
-    { openedImage = "", message = "" }
+type Msg =
+ --  Flip String
+      Reset |
+      ShuffledDone (List ImageRecord)
 
 
-
--- update
-
-
-type Msg
-    = Flip String
-
-
-update : Msg -> Model -> Model
-update msg model =
-    case msg of
-        Flip openedImage ->
-            if model.openedImage == "" then
-                { openedImage = openedImage, message = "one more!" }
-
-            else if openedImage == model.openedImage then
-                { openedImage = "", message = "Bingo!" }
-
-            else
-                { openedImage = "", message = "too bad :(" }
-
-
-images1 : List String
-images1 =
+images : List String
+images =
     let
-        images =
+        imagePaths =
             [ "src/img/bob_the_builder_01.jpeg"
             , "src/img/dizzy.jpeg"
             , "src/img/rollie.jpeg"
@@ -61,7 +40,48 @@ images1 =
             , "src/img/scoop.jpeg"
             ]
     in
-    images ++ images
+    imagePaths ++ imagePaths
+
+
+
+-- init
+
+
+init : Flags -> ( Model, Cmd Msg )
+init flags =
+    ( generateImageRecords images
+    , Random.generate ShuffledDone (shuffle (generateImageRecords images))
+    )
+
+
+generateImageRecords imageUrls =
+    List.indexedMap
+        (\index imageUrl ->
+            ImageRecord index imageUrl False
+        )
+        imageUrls
+
+
+
+-- update
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        -- Flip openedImage ->
+        --     if model.openedImage == "" then
+        --         ( { openedImage = openedImage, message = "one more!" }
+        --         , Random.generate ShuffledDone (shuffle model)
+        --         )
+        --     else if openedImage == model.openedImage then
+        --         { openedImage = "", message = "Bingo!" }
+        --     else
+        --         { openedImage = "", message = "too bad :(" }
+        ShuffledDone shuffledList ->
+            ( shuffledList, Cmd.none )
+        Reset ->
+            ( model, Random.generate ShuffledDone (shuffle (generateImageRecords images)))
 
 
 split : Int -> List a -> List (List a)
@@ -81,7 +101,7 @@ styleFlexBox direction =
     ]
 
 
-squares : List (List String) -> List (Html Msg)
+squares : List (List ImageRecord) -> List (Html Msg)
 squares imagePaths =
     List.map
         (\innerList ->
@@ -89,15 +109,16 @@ squares imagePaths =
                 []
                 (List.map
                     (\item ->
-                         div
+                        div
                             [ style "opacity" "0.5", style "border-style" "dotted" ]
-                            [ img [ src item, width 200, height 200, onClick (Flip item) ] [] ]
-
+                            [ img [ src item.url, width 200, height 200 ] [] ]
                     )
                     innerList
                 )
         )
         imagePaths
+
+
 
 -- view
 
@@ -105,7 +126,17 @@ squares imagePaths =
 view : Model -> Html Msg
 view model =
     div (styleFlexBox "column")
-        [ div (styleFlexBox "row") (squares (split 4 images1))
-        , div [] [ text model.message ]
+        [ div (styleFlexBox "row") (squares (split 4 model))
+
+        , button [ onClick Reset ] [ text "generate new" ]
         , div [] []
         ]
+
+
+main =
+    Browser.element
+        { init = init
+        , update = update
+        , view = view
+        , subscriptions = \_ -> Sub.none
+        }
