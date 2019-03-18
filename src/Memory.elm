@@ -1,13 +1,14 @@
-module Main exposing (Model, Msg(..), images, init, main, split, squares, styleFlexBox, update, view)
+module Main exposing (Model, Msg(..), imageRecords, init, main, split, squares, styleFlexBox, update, view)
 
-import Array
+import Array exposing (Array, indexedMap)
 import Browser
 import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (height, src, style, width)
 import Html.Events exposing (onClick)
 import List exposing (drop, take)
 import Random
-import Random.List exposing (shuffle)
+import Random.List
+import Random.Array
 
 
 type alias Flags =
@@ -22,16 +23,17 @@ type alias Model =
     List ImageRecord
 
 
-type Msg =
- --  Flip String
-      Reset |
-      ShuffledDone (List ImageRecord)
+type Msg
+    = --  Flip String
+      Reset
+    | ShuffledDone (List ImageRecord)
+    | SelectSquare Int
 
 
-images : List String
-images =
+imageRecords : List ImageRecord
+imageRecords =
     let
-        imagePaths =
+        urls =
             [ "src/img/bob_the_builder_01.jpeg"
             , "src/img/dizzy.jpeg"
             , "src/img/rollie.jpeg"
@@ -40,8 +42,18 @@ images =
             , "src/img/scoop.jpeg"
             ]
     in
-    imagePaths ++ imagePaths
+    urls ++ urls
+    -- |> Array.fromList
+    |> generateImageRecords
 
+
+generateImageRecords : List String -> List ImageRecord
+generateImageRecords imageRecords1 =
+    List.indexedMap
+        (\index imageUrl ->
+            ImageRecord index imageUrl False
+        )
+        imageRecords1
 
 
 -- init
@@ -49,17 +61,10 @@ images =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( generateImageRecords images
-    , Random.generate ShuffledDone (shuffle (generateImageRecords images))
+    ( imageRecords
+    , Random.generate ShuffledDone (Random.List.shuffle imageRecords)
     )
 
-
-generateImageRecords imageUrls =
-    List.indexedMap
-        (\index imageUrl ->
-            ImageRecord index imageUrl False
-        )
-        imageUrls
 
 
 
@@ -80,8 +85,12 @@ update msg model =
         --         { openedImage = "", message = "too bad :(" }
         ShuffledDone shuffledList ->
             ( shuffledList, Cmd.none )
+
         Reset ->
-            ( model, Random.generate ShuffledDone (shuffle (generateImageRecords images)))
+            ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
+
+        SelectSquare id ->
+            ( model, Cmd.none )
 
 
 split : Int -> List a -> List (List a)
@@ -94,15 +103,16 @@ split i list =
             listHead :: split i (drop i list)
 
 
-styleFlexBox : String -> List (Html.Attribute Msg)
-styleFlexBox direction =
-    [ style "display" "flex"
-    , style "flex-direction" direction
-    ]
+styleFlipped opened =
+    if opened then
+        style "opacity" "1.0"
+
+    else
+        style "opacity" "0.5"
 
 
 squares : List (List ImageRecord) -> List (Html Msg)
-squares imagePaths =
+squares images =
     List.map
         (\innerList ->
             div
@@ -110,24 +120,33 @@ squares imagePaths =
                 (List.map
                     (\item ->
                         div
-                            [ style "opacity" "0.5", style "border-style" "dotted" ]
+                            [ styleFlipped item.opened
+                            , style "border-style" "dotted"
+                            , onClick (SelectSquare item.id)
+                            ]
                             [ img [ src item.url, width 200, height 200 ] [] ]
                     )
                     innerList
                 )
         )
-        imagePaths
+        images
 
 
 
 -- view
 
 
+styleFlexBox : String -> List (Html.Attribute Msg)
+styleFlexBox direction =
+    [ style "display" "flex"
+    , style "flex-direction" direction
+    ]
+
+
 view : Model -> Html Msg
 view model =
     div (styleFlexBox "column")
-        [ div (styleFlexBox "row") (squares (split 4 model))
-
+        [ div (styleFlexBox "row") (squares (split 3 model))
         , button [ onClick Reset ] [ text "generate new" ]
         , div [] []
         ]
