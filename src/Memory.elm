@@ -7,8 +7,8 @@ import Html.Attributes exposing (height, src, style, width)
 import Html.Events exposing (onClick)
 import List exposing (drop, take)
 import Random
-import Random.List
 import Random.Array
+import Random.List
 
 
 type alias Flags =
@@ -42,9 +42,10 @@ imageRecords =
             , "src/img/scoop.jpeg"
             ]
     in
-    urls ++ urls
-    -- |> Array.fromList
-    |> generateImageRecords
+    urls
+        ++ urls
+        -- |> Array.fromList
+        |> generateImageRecords
 
 
 generateImageRecords : List String -> List ImageRecord
@@ -56,6 +57,7 @@ generateImageRecords imageRecords1 =
         imageRecords1
 
 
+
 -- init
 
 
@@ -64,7 +66,6 @@ init flags =
     ( imageRecords
     , Random.generate ShuffledDone (Random.List.shuffle imageRecords)
     )
-
 
 
 
@@ -90,7 +91,19 @@ update msg model =
             ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
 
         SelectSquare id ->
-            ( model, Cmd.none )
+            ( changeModel model id, Cmd.none )
+
+
+changeModel model1 id1 =
+    List.map
+        (\item ->
+            if item.id == id1 then
+                { item | opened = True }
+
+            else
+                item
+        )
+        model1
 
 
 split : Int -> List a -> List (List a)
