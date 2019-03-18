@@ -20,7 +20,8 @@ type alias ImageRecord =
 
 
 type alias Model =
-    List ImageRecord
+    { tiles : List ImageRecord
+    }
 
 
 type Msg
@@ -63,7 +64,7 @@ generateImageRecords imageRecords1 =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( imageRecords
+    ( { tiles = imageRecords }
     , Random.generate ShuffledDone (Random.List.shuffle imageRecords)
     )
 
@@ -85,13 +86,13 @@ update msg model =
         --     else
         --         { openedImage = "", message = "too bad :(" }
         ShuffledDone shuffledList ->
-            ( shuffledList, Cmd.none )
+            ( { tiles = shuffledList }, Cmd.none )
 
         Reset ->
             ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
 
         SelectSquare id ->
-            ( changeModel model id, Cmd.none )
+            ( { tiles = (changeModel model.tiles id) }, Cmd.none )
 
 
 changeModel model1 id1 =
@@ -159,7 +160,7 @@ styleFlexBox direction =
 view : Model -> Html Msg
 view model =
     div (styleFlexBox "column")
-        [ div (styleFlexBox "row") (squares (split 3 model))
+        [ div (styleFlexBox "row") (squares (split 3 model.tiles))
         , button [ onClick Reset ] [ text "generate new" ]
         , div [] []
         ]
