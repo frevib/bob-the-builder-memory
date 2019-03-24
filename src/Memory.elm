@@ -16,11 +16,12 @@ type alias Flags =
 
 
 type alias ImageRecord =
-    { id : Int, url : String, opened : Bool }
+    { id : Int, url : String, opened : Bool, found : Bool }
 
 
 type alias Model =
     { tiles : List ImageRecord
+    , selectedImageUrl : String
     }
 
 
@@ -28,7 +29,7 @@ type Msg
     = --  Flip String
       Reset
     | ShuffledDone (List ImageRecord)
-    | SelectSquare Int
+    | SelectSquare ImageRecord
 
 
 imageRecords : List ImageRecord
@@ -53,7 +54,7 @@ generateImageRecords : List String -> List ImageRecord
 generateImageRecords imageRecords1 =
     List.indexedMap
         (\index imageUrl ->
-            ImageRecord index imageUrl False
+            ImageRecord index imageUrl False False
         )
         imageRecords1
 
@@ -64,7 +65,7 @@ generateImageRecords imageRecords1 =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { tiles = imageRecords }
+    ( { tiles = imageRecords, selectedImageUrl = "" }
     , Random.generate ShuffledDone (Random.List.shuffle imageRecords)
     )
 
@@ -76,26 +77,49 @@ init flags =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        -- Flip openedImage ->
-        --     if model.openedImage == "" then
-        --         ( { openedImage = openedImage, message = "one more!" }
-        --         , Random.generate ShuffledDone (shuffle model)
-        --         )
-        --     else if openedImage == model.openedImage then
-        --         { openedImage = "", message = "Bingo!" }
-        --     else
-        --         { openedImage = "", message = "too bad :(" }
         ShuffledDone shuffledList ->
-            ( { tiles = shuffledList }, Cmd.none )
+            ( { tiles = shuffledList, selectedImageUrl = "" }, Cmd.none )
 
         Reset ->
             ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
 
-        SelectSquare id ->
-            ( { tiles = (changeModel model.tiles id) }, Cmd.none )
+        SelectSquare imageRecord_ ->
+            if model.selectedImageUrl == imageRecord_.url then
+                ( { tiles = setFound model.tiles model.selectedImageUrl, selectedImageUrl = "" }, Cmd.none )
+
+            else if model.selectedImageUrl == "" then
+                ( { tiles = flipTile model.tiles imageRecord_.id, selectedImageUrl = imageRecord_.url }, Cmd.none )
+
+            else
+                ( { tiles = closeOpened model.tiles, selectedImageUrl = "" }, Cmd.none )
 
 
-changeModel model1 id1 =
+getSelectedUrl imageRecords1 id =
+    List.map
+        (\item ->
+            if item.id == id then
+                item.url
+
+            else
+                ""
+        )
+        imageRecords1
+        |> String.concat
+
+
+setFound imageRecords3 selectedImageUrl2 =
+    List.map
+        (\item ->
+            if item.url == selectedImageUrl2 then
+                { item | found = True }
+
+            else
+                item
+        )
+        imageRecords3
+
+
+flipTile imageRecords2 id1 =
     List.map
         (\item ->
             if item.id == id1 then
@@ -104,7 +128,15 @@ changeModel model1 id1 =
             else
                 item
         )
-        model1
+        imageRecords2
+
+
+closeOpened imageRecords5 =
+    List.map
+        (\item ->
+            { item | opened = False }
+        )
+        imageRecords5
 
 
 split : Int -> List a -> List (List a)
@@ -117,12 +149,20 @@ split i list =
             listHead :: split i (drop i list)
 
 
-styleFlipped opened =
-    if opened then
-        style "opacity" "1.0"
+
+-- tileStateAttributes item =
+--     if item.opene
+
+
+styleFlipped item =
+    if item.found then
+        [ style "opacity" "0.7" ]
+
+    else if item.opened then
+        [ style "opacity" "1.0" ]
 
     else
-        style "opacity" "0.5"
+        [ style "opacity" "0.3", onClick (SelectSquare item) ]
 
 
 squares : List (List ImageRecord) -> List (Html Msg)
@@ -134,10 +174,9 @@ squares images =
                 (List.map
                     (\item ->
                         div
-                            [ styleFlipped item.opened
-                            , style "border-style" "dotted"
-                            , onClick (SelectSquare item.id)
-                            ]
+                            (styleFlipped item
+                                ++ [ style "border-style" "dotted" ]
+                            )
                             [ img [ src item.url, width 200, height 200 ] [] ]
                     )
                     innerList
