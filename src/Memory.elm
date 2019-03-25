@@ -46,7 +46,6 @@ imageRecords =
     in
     urls
         ++ urls
-        -- |> Array.fromList
         |> generateImageRecords
 
 
