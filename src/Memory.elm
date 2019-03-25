@@ -93,19 +93,6 @@ update msg model =
                 ( { tiles = closeOpened model.tiles, selectedImageUrl = "" }, Cmd.none )
 
 
-getSelectedUrl imageRecords1 id =
-    List.map
-        (\item ->
-            if item.id == id then
-                item.url
-
-            else
-                ""
-        )
-        imageRecords1
-        |> String.concat
-
-
 setFound imageRecords3 selectedImageUrl2 =
     List.map
         (\item ->
@@ -161,7 +148,7 @@ styleFlipped item =
         [ style "opacity" "1.0" ]
 
     else
-        [ style "opacity" "0.3", onClick (SelectSquare item) ]
+        [ style "opacity" "0", onClick (SelectSquare item) ]
 
 
 squares : List (List ImageRecord) -> List (Html Msg)
@@ -173,10 +160,11 @@ squares images =
                 (List.map
                     (\item ->
                         div
-                            (styleFlipped item
-                                ++ [ style "border-style" "dotted" ]
-                            )
-                            [ img [ src item.url, width 200, height 200 ] [] ]
+                            [ style "border-style" "dotted" ]
+                            [ div
+                                (styleFlipped item)
+                                [ img [ src item.url, width 200, height 200 ] [] ]
+                            ]
                     )
                     innerList
                 )
