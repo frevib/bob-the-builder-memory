@@ -26,8 +26,7 @@ type alias Model =
 
 
 type Msg
-    = --  Flip String
-      Reset
+    = Reset
     | ShuffledDone (List ImageRecord)
     | SelectSquare ImageRecord
 
