@@ -135,11 +135,6 @@ split i list =
             listHead :: split i (drop i list)
 
 
-
--- tileStateAttributes item =
---     if item.opene
-
-
 styleFlipped item =
     if item.found then
         [ style "opacity" "0.7" ]
