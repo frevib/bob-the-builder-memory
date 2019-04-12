@@ -25,6 +25,7 @@ type alias ImageRecord =
 type alias Model =
     { tiles : List ImageRecord
     , selectedImageUrl : String
+    , tilesClickable : Bool
     }
 
 
@@ -33,7 +34,7 @@ type Msg
     | ShuffledDone (List ImageRecord)
     | SelectSquare ImageRecord
     | FirstMessage ImageRecord
-    | OpenTile ImageRecord
+    | OpenSecondTile ImageRecord
     | CloseTile ImageRecord
     | CloseOpened
 
@@ -70,7 +71,7 @@ generateImageRecords imageRecords1 =
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { tiles = imageRecords, selectedImageUrl = "" }
+    ( { tiles = imageRecords, selectedImageUrl = "", tilesClickable = True }
     , Random.generate ShuffledDone (Random.List.shuffle imageRecords)
     )
 
@@ -83,7 +84,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ShuffledDone shuffledList ->
-            ( { tiles = shuffledList, selectedImageUrl = "" }, Cmd.none )
+            ( { tiles = shuffledList, selectedImageUrl = "", tilesClickable = True }, Cmd.none )
 
         Reset ->
             ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
@@ -99,26 +100,26 @@ update msg model =
             )
 
         CloseTile imageRecord_ ->
-            ( { tiles = closeTile model.tiles imageRecord_.id, selectedImageUrl = "" }, Cmd.none )
+            ( { tiles = closeTile model.tiles imageRecord_.id, selectedImageUrl = "", tilesClickable = True }, Cmd.none )
 
-        OpenTile imageRecord_ ->
-            ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = "" }, Cmd.none )
+        OpenSecondTile imageRecord_ ->
+            ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = "", tilesClickable = False }, Cmd.none )
 
-        CloseOpened->
-            ( { tiles = closeOpened model.tiles, selectedImageUrl = "" }, Cmd.none )
+        CloseOpened ->
+            ( { tiles = closeOpened model.tiles, selectedImageUrl = "", tilesClickable = True }, Cmd.none )
 
         SelectSquare imageRecord_ ->
             if model.selectedImageUrl == imageRecord_.url then
-                ( { tiles = setFound model.tiles model.selectedImageUrl, selectedImageUrl = "" }, Cmd.none )
+                ( { tiles = setFound model.tiles model.selectedImageUrl, selectedImageUrl = "", tilesClickable = True }, Cmd.none )
 
             else if model.selectedImageUrl == "" then
-                ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = imageRecord_.url }, Cmd.none )
+                ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = imageRecord_.url, tilesClickable = True }, Cmd.none )
 
             else
                 ( model
                 , Cmd.batch
                     [ Delay.sequence
-                        [ ( 0, Millisecond, OpenTile imageRecord_ )
+                        [ ( 0, Millisecond, OpenSecondTile imageRecord_ )
                         , ( 2000, Millisecond, CloseOpened )
                         ]
                     ]
@@ -179,19 +180,22 @@ split i list =
             listHead :: split i (drop i list)
 
 
-styleFlipped item =
+styleFlipped item tilesClickable =
     if item.found then
-        [ style "opacity" "0.3" ]
+        [ style "opacity" "1" ]
 
     else if item.opened then
         [ style "opacity" "0.5" ]
 
+    else if tilesClickable then
+        [ style "opacity" "0", onClick (SelectSquare item)  ]
+
     else
-        [ style "opacity" "0", onClick (SelectSquare item) ]
+        [ style "opacity" "0" ]
 
 
-squares : List (List ImageRecord) -> List (Html Msg)
-squares images =
+squares : List (List ImageRecord) -> Model -> List (Html Msg)
+squares images model =
     List.map
         (\innerList ->
             div
@@ -201,7 +205,7 @@ squares images =
                         div
                             [ style "border-style" "dotted" ]
                             [ div
-                                (styleFlipped item)
+                                (styleFlipped item model.tilesClickable)
                                 [ img [ src item.url, width 200, height 200 ] [] ]
                             ]
                     )
@@ -225,18 +229,10 @@ styleFlexBox direction =
 view : Model -> Html Msg
 view model =
     div (styleFlexBox "column")
-        [ div (styleFlexBox "row") (squares (split 3 model.tiles))
+        [ div (styleFlexBox "row") (squares (split 3 model.tiles) model)
         , button [ onClick Reset ] [ text "generate new" ]
         , div [] []
         ]
-
-
-
--- subscriptions : Model -> Sub Msg
--- subscriptions model =
---     Sub.batch
---         [ onKeyDown (Decode.map AddKey keyDecoder)
---         ]
 
 
 main =
