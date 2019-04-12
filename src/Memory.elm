@@ -2,9 +2,12 @@ module Main exposing (Model, Msg(..), imageRecords, init, main, split, squares, 
 
 import Array exposing (Array, indexedMap)
 import Browser
+import Browser.Events exposing (onKeyDown)
+import Delay exposing (..)
 import Html exposing (Html, button, div, img, text)
 import Html.Attributes exposing (height, src, style, width)
 import Html.Events exposing (onClick)
+import Json.Decode as Decode
 import List exposing (drop, take)
 import Random
 import Random.Array
@@ -29,6 +32,10 @@ type Msg
     = Reset
     | ShuffledDone (List ImageRecord)
     | SelectSquare ImageRecord
+    | FirstMessage ImageRecord
+    | OpenTile ImageRecord
+    | CloseTile ImageRecord
+    | CloseOpened
 
 
 imageRecords : List ImageRecord
@@ -81,15 +88,41 @@ update msg model =
         Reset ->
             ( model, Random.generate ShuffledDone (Random.List.shuffle imageRecords) )
 
+        FirstMessage imageRecord_ ->
+            ( model
+            , Cmd.batch
+                [ Delay.sequence
+                    [ ( 0, Millisecond, SelectSquare imageRecord_ )
+                    , ( 2000, Millisecond, CloseTile imageRecord_ )
+                    ]
+                ]
+            )
+
+        CloseTile imageRecord_ ->
+            ( { tiles = closeTile model.tiles imageRecord_.id, selectedImageUrl = "" }, Cmd.none )
+
+        OpenTile imageRecord_ ->
+            ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = "" }, Cmd.none )
+
+        CloseOpened->
+            ( { tiles = closeOpened model.tiles, selectedImageUrl = "" }, Cmd.none )
+
         SelectSquare imageRecord_ ->
             if model.selectedImageUrl == imageRecord_.url then
                 ( { tiles = setFound model.tiles model.selectedImageUrl, selectedImageUrl = "" }, Cmd.none )
 
             else if model.selectedImageUrl == "" then
-                ( { tiles = flipTile model.tiles imageRecord_.id, selectedImageUrl = imageRecord_.url }, Cmd.none )
+                ( { tiles = openTile model.tiles imageRecord_.id, selectedImageUrl = imageRecord_.url }, Cmd.none )
 
             else
-                ( { tiles = closeOpened model.tiles, selectedImageUrl = "" }, Cmd.none )
+                ( model
+                , Cmd.batch
+                    [ Delay.sequence
+                        [ ( 0, Millisecond, OpenTile imageRecord_ )
+                        , ( 2000, Millisecond, CloseOpened )
+                        ]
+                    ]
+                )
 
 
 setFound imageRecords3 selectedImageUrl2 =
@@ -104,7 +137,7 @@ setFound imageRecords3 selectedImageUrl2 =
         imageRecords3
 
 
-flipTile imageRecords2 id1 =
+openTile imageRecords2 id1 =
     List.map
         (\item ->
             if item.id == id1 then
@@ -114,6 +147,18 @@ flipTile imageRecords2 id1 =
                 item
         )
         imageRecords2
+
+
+closeTile imageRecords7 id7 =
+    List.map
+        (\item ->
+            if item.id == id7 then
+                { item | opened = False }
+
+            else
+                item
+        )
+        imageRecords7
 
 
 closeOpened imageRecords5 =
@@ -136,10 +181,10 @@ split i list =
 
 styleFlipped item =
     if item.found then
-        [ style "opacity" "0.7" ]
+        [ style "opacity" "0.3" ]
 
     else if item.opened then
-        [ style "opacity" "1.0" ]
+        [ style "opacity" "0.5" ]
 
     else
         [ style "opacity" "0", onClick (SelectSquare item) ]
@@ -184,6 +229,14 @@ view model =
         , button [ onClick Reset ] [ text "generate new" ]
         , div [] []
         ]
+
+
+
+-- subscriptions : Model -> Sub Msg
+-- subscriptions model =
+--     Sub.batch
+--         [ onKeyDown (Decode.map AddKey keyDecoder)
+--         ]
 
 
 main =
